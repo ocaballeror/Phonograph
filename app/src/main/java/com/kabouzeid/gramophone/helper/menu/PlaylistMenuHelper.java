@@ -23,6 +23,8 @@ import com.kabouzeid.gramophone.util.PlaylistsUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static android.widget.Toast.LENGTH_SHORT;
+
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
@@ -47,6 +49,29 @@ public class PlaylistMenuHelper {
             case R.id.action_delete_playlist:
                 DeletePlaylistDialog.create(playlist).show(activity.getSupportFragmentManager(), "DELETE_PLAYLIST");
                 return true;
+            case R.id.action_remove_duplicates:
+                List<Song> songs = new ArrayList<>(getPlaylistSongs(activity, playlist));
+                List<PlaylistSong> toRemove = new ArrayList<>();
+                Collections.sort(songs,new Comparator<Song>(){
+                    @Override
+                    public int compare(Song song, Song t1) {
+                        return song.id >= t1.id? 1:-1;
+                    }
+                });
+
+                for (int i = 0; i < songs.size(); i++) {
+                    if(i < songs.size() -1 && songs.get(i).id == songs.get(i+1).id){
+                        toRemove.add((PlaylistSong)songs.get(i+1));
+                    }
+                }
+                String toastTxt = "Removed " + toRemove.size() + " duplicates";
+                final Toast toastDups = Toast.makeText(activity, toastTxt, Toast.LENGTH_SHORT);
+                if(toRemove.size() > 0){
+                    PlaylistsUtil.removeFromPlaylist(activity.getApplicationContext(), toRemove);
+                }
+                toastDups.show();
+                break;
+
             case R.id.action_save_playlist:
                 new SavePlaylistAsyncTask(activity).execute(playlist);
                 return true;
