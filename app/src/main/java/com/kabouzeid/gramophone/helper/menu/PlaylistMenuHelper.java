@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static android.widget.Toast.LENGTH_SHORT;
+
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
@@ -59,7 +61,7 @@ public class PlaylistMenuHelper {
                 Collections.sort(songs,new Comparator<Song>(){
                     @Override
                     public int compare(Song song, Song t1) {
-                        return song.id > t1.id? 1:-1;
+                        return song.id >= t1.id? 1:-1;
                     }
                 });
 
@@ -68,11 +70,12 @@ public class PlaylistMenuHelper {
                         toRemove.add((PlaylistSong)songs.get(i+1));
                     }
                 }
+                String toastTxt = "Removed " + toRemove.size() + " duplicates";
+                final Toast toastDups = Toast.makeText(activity, toastTxt, Toast.LENGTH_SHORT);
                 if(toRemove.size() > 0){
-                    final Toast toast = Toast.makeText(activity, String.format("Removed %d duplicates", toRemove.size()), Toast.LENGTH_SHORT);
                     PlaylistsUtil.removeFromPlaylist(activity.getApplicationContext(), toRemove);
-                    toast.show();
                 }
+                toastDups.show();
                 break;
 
             case R.id.action_save_playlist:
