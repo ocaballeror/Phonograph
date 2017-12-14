@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.annotation.SuppressLint;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -17,16 +18,21 @@ import com.kabouzeid.gramophone.loader.PlaylistSongLoader;
 import com.kabouzeid.gramophone.misc.WeakContextAsyncTask;
 import com.kabouzeid.gramophone.model.AbsCustomPlaylist;
 import com.kabouzeid.gramophone.model.Playlist;
+import com.kabouzeid.gramophone.model.PlaylistSong;
 import com.kabouzeid.gramophone.model.Song;
 import com.kabouzeid.gramophone.util.PlaylistsUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
 public class PlaylistMenuHelper {
+    @SuppressLint("StaticFieldLeak")
     public static boolean handleMenuClick(@NonNull AppCompatActivity activity, @NonNull final Playlist playlist, @NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_play:
@@ -47,6 +53,28 @@ public class PlaylistMenuHelper {
             case R.id.action_delete_playlist:
                 DeletePlaylistDialog.create(playlist).show(activity.getSupportFragmentManager(), "DELETE_PLAYLIST");
                 return true;
+            case R.id.action_remove_duplicates:
+                List<Song> songs = new ArrayList<>(getPlaylistSongs(activity, playlist));
+                List<PlaylistSong> toRemove = new ArrayList<>();
+                Collections.sort(songs,new Comparator<Song>(){
+                    @Override
+                    public int compare(Song song, Song t1) {
+                        return song.id > t1.id? 1:-1;
+                    }
+                });
+
+                for (int i = 0; i < songs.size(); i++) {
+                    if(i < songs.size() -1 && songs.get(i).id == songs.get(i+1).id){
+                        toRemove.add((PlaylistSong)songs.get(i+1));
+                    }
+                }
+                if(toRemove.size() > 0){
+                    final Toast toast = Toast.makeText(activity, String.format("Removed %d duplicates", toRemove.size()), Toast.LENGTH_SHORT);
+                    PlaylistsUtil.removeFromPlaylist(activity.getApplicationContext(), toRemove);
+                    toast.show();
+                }
+                break;
+
             case R.id.action_save_playlist:
                 new SavePlaylistAsyncTask(activity).execute(playlist);
                 return true;
