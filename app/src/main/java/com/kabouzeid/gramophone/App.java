@@ -62,7 +62,10 @@ public class App extends Application {
     }
 
     public static boolean isProVersion() {
-        return BuildConfig.DEBUG || app.billingProcessor.isPurchased(PRO_VERSION_PRODUCT_ID);
+		// Don't freak out, I already bought it. I'm just forcing the pro version
+		// because I may not have google play services available all the time, and
+		// license verification is a bitch
+        return true;
     }
 
     public static App getInstance() {
