@@ -73,3 +73,6 @@ fastlane/test_output
 fastlane/metadata/
 
 Gemfile.lock
+
+# Custom things
+.apksigner
