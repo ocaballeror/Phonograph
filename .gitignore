@@ -71,3 +71,6 @@ fastlane/test_output
 
 # Google Play files
 fastlane/metadata/
+
+# Custom things
+.apksigner
