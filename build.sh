@@ -1,6 +1,7 @@
 #!/bin/bash
 
 quit(){
+	cd $cwd
 	echo "$1" >&2
 	[ $# -ge 2 ] && exit "$2"
 	exit 1
