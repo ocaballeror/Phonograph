@@ -21,12 +21,18 @@ while [ $# -gt 0 ]; do
 done
 
 if ! $skipgit; then
+	build=false
+
 	git fetch --all
-	git co master || quit 'Git pull failed'
-	git pull || quit 'Git pull failed'
+	git checkout master || quit 'Git checkout failed'
+	[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/master)" ] && build=true
+	git reset --hard origin/master
+
 	output="$(git rebase upstream/master)"
-	[ "$?" = 0 ] || { git rebase --abort; quit 'Git rebase failed'; }
-	[ "$output" == "Current branch master is up to date." ] && quit "$output" 0
+	[ $? = 0 ] || { git rebase --abort; quit 'Git rebase failed'; }
+	[ "$output" = "Current branch master is up to date." ] || build=true
+
+	$build || quit "$output" 0
 fi
 
 [ "$JAVA_HOME" ] || export JAVA_HOME='/usr/lib/jvm/java-8-openjdk-amd64'
@@ -48,4 +54,6 @@ zipalign -v -p 4 app-release-unsigned.apk app-release-aligned.apk || quit 'Zipal
 apksigner sign --ks /home/oscar/.keystore.jks --out phonograph.apk app-release-aligned.apk <.apksigner || quit 'Apksigner failed'
 mv phonograph.apk /srv/sftp/phonograph-$(date '+%d%m%y').apk
 
-cd $cwd
+[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/master)" ] && git push -f origin master
+
+cd "$cwd"
