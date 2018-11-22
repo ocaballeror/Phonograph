@@ -54,6 +54,8 @@ zipalign -v -p 4 app-release-unsigned.apk app-release-aligned.apk || quit 'Zipal
 apksigner sign --ks /home/oscar/.keystore.jks --out phonograph.apk app-release-aligned.apk <.apksigner || quit 'Apksigner failed'
 mv phonograph.apk /srv/sftp/phonograph-$(date '+%d%m%y').apk
 
-[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/master)" ] && git push -f origin master
+if ! $skipgit; then
+	[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/master)" ] && git push -f origin master
+fi
 
 cd "$cwd"
