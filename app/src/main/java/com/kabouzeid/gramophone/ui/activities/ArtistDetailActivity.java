@@ -4,13 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -20,6 +13,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.afollestad.materialcab.MaterialCab;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -53,7 +54,7 @@ import com.kabouzeid.gramophone.util.PhonographColorUtil;
 import com.kabouzeid.gramophone.util.PreferenceUtil;
 import com.kabouzeid.gramophone.util.Util;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -105,27 +106,6 @@ public class ArtistDetailActivity extends AbsSlidingMusicPanelActivity implement
 
     private boolean forceDownload;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setDrawUnderStatusbar();
-        ButterKnife.bind(this);
-
-        lastFMRestClient = new LastFMRestClient(this);
-        usePalette = PreferenceUtil.getInstance(this).albumArtistColoredFooters();
-
-        initViews();
-        setUpObservableListViewParams();
-        setUpToolbar();
-        setUpViews();
-
-        getSupportLoaderManager().initLoader(LOADER_ID, getIntent().getExtras(), this);
-    }
-
-    @Override
-    protected View createContentView() {
-        return wrapSlidingMusicPanel(R.layout.activity_artist_detail);
-    }
 
     private final SimpleObservableScrollViewCallbacks observableScrollViewCallbacks = new SimpleObservableScrollViewCallbacks() {
         @Override
@@ -152,6 +132,29 @@ public class ArtistDetailActivity extends AbsSlidingMusicPanelActivity implement
             artistName.setTranslationY(titleTranslationY);
         }
     };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setDrawUnderStatusbar();
+        ButterKnife.bind(this);
+
+        lastFMRestClient = new LastFMRestClient(this);
+        usePalette = PreferenceUtil.getInstance(this).albumArtistColoredFooters();
+
+        initViews();
+        setUpObservableListViewParams();
+        setUpToolbar();
+        setUpViews();
+
+        getSupportLoaderManager().initLoader(LOADER_ID, getIntent().getExtras(), this);
+    }
+
+    @Override
+    protected View createContentView() {
+        return wrapSlidingMusicPanel(R.layout.activity_artist_detail);
+    }
+
 
     private void setUpObservableListViewParams() {
         artistImageViewHeight = getResources().getDimensionPixelSize(R.dimen.header_image_height);
@@ -322,7 +325,7 @@ public class ArtistDetailActivity extends AbsSlidingMusicPanelActivity implement
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        final ArrayList<Song> songs = songAdapter.getDataSet();
+        final List<Song> songs = songAdapter.getDataSet();
         switch (id) {
             case R.id.action_sleep_timer:
                 new SleepTimerDialog().show(getSupportFragmentManager(), "SET_SLEEP_TIMER");
